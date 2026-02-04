@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的极简收集箱</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f4f4f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
+        textarea { width: 100%; height: 100px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; padding: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #3ecf8e; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #36b37a; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>内容存入数据库</h3>
+        <textarea id="userInput" placeholder="在这里输入内容..."></textarea>
+        <button onclick="saveData()">提交</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        // 配置你的 Supabase 密钥
+        const SUPABASE_URL = 'https://uarwrxxnlweigiflzozd.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhcndyeHhubHdlaWdpZmx6b3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMDIxNDksImV4cCI6MjA4NTY3ODE0OX0.HAQfOQQM0iLWR7R_lzvT1SOL5Ks2yhyOfWlkv4xn1mw';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function saveData() {
+            const content = document.getElementById('userInput').value;
+            const status = document.getElementById('status');
+            
+            if (!content) return alert("请输入内容");
+
+            status.innerText = "提交中...";
+            
+            const { data, error } = await supabase
+                .from('user')
+                .insert([{ name: content }]);
+
+            if (error) {
+                status.innerText = "失败: " + error.message;
+            } else {
+                status.innerText = "✅ 保存成功！";
+                document.getElementById('userInput').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
