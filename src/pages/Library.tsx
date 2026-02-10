@@ -73,7 +73,7 @@ const Library: React.FC = () => {
         </div>
       </header>
 
-      <section className="py-4">
+      {/* <section className="py-4">
         <div className="px-4 flex items-center justify-between mb-2">
           <h3 className="text-lg font-bold">For You</h3>
           <button className="text-primary text-sm font-semibold">See All</button>
@@ -100,7 +100,7 @@ const Library: React.FC = () => {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {supabasePhotos.map(group => (
         <section key={group.date} className="mt-4">
