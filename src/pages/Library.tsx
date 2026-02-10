@@ -1,17 +1,16 @@
 
-import React, { useRef, useState ,useEffect  } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_PHOTOS, MOCK_MEMORIES, getPhotos } from '../services/constants';
+import { MOCK_MEMORIES, getPhotos } from '../services/constants';
 import { supabase } from '../lib/supabaseClient';
 const Library: React.FC = () => {
   const navigate = useNavigate();
   const [supabasePhotos, setSupabasePhotos] = useState<any[]>([]);
-
+  const fetchPhotos = async () => {
+    const photos = await getPhotos();
+    setSupabasePhotos(photos);
+  };
   useEffect(() => {
-    const fetchPhotos = async () => {
-      const photos = await getPhotos();
-      setSupabasePhotos(photos);
-    };
     fetchPhotos();
   }, []);
 
@@ -49,14 +48,7 @@ const Library: React.FC = () => {
 
       if (error) throw error;
 
-      // 3. 获取公开访问链接 (前提是 Bucket 设为了 Public)
-      const { data: publicUrlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      console.log('文件上传成功，访问地址:', publicUrlData.publicUrl);
-      alert('上传成功！');
-
+      fetchPhotos();
     } catch (error) {
       console.error('上传出错:', error.message);
     }
