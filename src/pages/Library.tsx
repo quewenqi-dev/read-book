@@ -15,14 +15,6 @@ const Library: React.FC = () => {
     fetchPhotos();
   }, []);
 
-  // Group photos by date
-  const groupedPhotos = MOCK_PHOTOS.reduce((groups: Record<string, typeof MOCK_PHOTOS>, photo) => {
-    const date = photo.date;
-    if (!groups[date]) groups[date] = [];
-    groups[date].push(photo);
-    return groups;
-  }, {});
-
   // 使用 ref 来操作隐藏的 input 元素
   const fileInputRef = useRef(null);
 
@@ -118,17 +110,17 @@ const Library: React.FC = () => {
         </div>
       </section>
 
-      {Object.entries(groupedPhotos).map(([date, photos]) => (
-        <section key={date} className="mt-4">
+      {supabasePhotos.map(group => (
+        <section key={group.date} className="mt-4">
           <div className="px-4 py-3 sticky top-[56px] bg-background-light dark:bg-background-dark z-20 flex flex-col">
-            <h3 className="text-lg font-bold">{date}</h3>
+            <h3 className="text-lg font-bold">{group.date}</h3>
             <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1">
               <span className="material-symbols-outlined text-sm">location_on</span>
-              {photos[0].location}
+              New York
             </p>
           </div>
           <div className="grid grid-cols-3 gap-0.5 px-0.5">
-            {supabasePhotos.map((photo) => (
+            {group.images.map((photo) => (
               <div
                 key={photo.id}
                 className="aspect-square relative group cursor-pointer overflow-hidden"

@@ -2,6 +2,33 @@
 import { Photo, Album, Person, Memory } from '../../types';
 import { supabase } from '../lib/supabaseClient';
 
+/**
+ * 将 Supabase 返回的扁平数组按日期分组
+ * @param {Array} list - Supabase 返回的原始数组
+ */
+const groupImagesByDate = (list) => {
+  const groups = list.reduce((acc, item) => {
+    // 1. 格式化日期 (去除具体时间，只保留 YYYY-MM-DD)
+    const date = item.created_at.split('T')[0]; 
+    
+    // 2. 查找是否已经存在该日期的组
+    let group = acc.find(g => g.date === date);
+    
+    if (!group) {
+      // 3. 不存在则创建新组
+      group = { date, images: [] };
+      acc.push(group);
+    }
+    
+    // 4. 将图片推入对应的组
+    group.images.push(item);
+    
+    return acc;
+  }, []);
+
+  return groups;
+};
+
 export const getPhotos = async () => {
   const { data, error } = await supabase
     .storage
@@ -17,7 +44,9 @@ export const getPhotos = async () => {
     return [];
   } else {
     console.log('文件列表:', data);
-    return data
+    //处理data,根据created_at字段处理成2维数组，created_at是创建时间
+
+    return groupImagesByDate(data)
   }
 }
 
