@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MOCK_PHOTOS, MOCK_MEMORIES } from '../constants';
-
+import { createClient } from '@supabase/supabase-js'
 const Library: React.FC = () => {
   const navigate = useNavigate();
 
@@ -14,12 +14,65 @@ const Library: React.FC = () => {
     return groups;
   }, {});
 
+  // 使用 ref 来操作隐藏的 input 元素
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click(); // 触发文件选择
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0]; // 获取选中的第一个文件
+    if (!file) return;
+
+    // 1. 简单的格式校验
+    if (!file.type.startsWith('image/')) {
+      alert('请选择图片文件！');
+      return;
+    }
+    // 配置你的 Supabase 密钥
+    const SUPABASE_URL = 'https://uarwrxxnlweigiflzozd.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhcndyeHhubHdlaWdpZmx6b3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMDIxNDksImV4cCI6MjA4NTY3ODE0OX0.HAQfOQQM0iLWR7R_lzvT1SOL5Ks2yhyOfWlkv4xn1mw';
+    // 1. 初始化，注意这里变量名改成了 myClient
+    // 初始化客户端
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    // 1. 生成唯一文件名 (防止重名覆盖)
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    try {
+      // 2. 调用 Supabase 存储 API
+      // .upload(路径, 文件数据, 配置项)
+      const { data, error } = await supabase.storage
+        .from('avatars') // 刚才创建的 Bucket 名称
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false // 是否覆盖同名文件
+        });
+
+      if (error) throw error;
+
+      // 3. 获取公开访问链接 (前提是 Bucket 设为了 Public)
+      const { data: publicUrlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      console.log('文件上传成功，访问地址:', publicUrlData.publicUrl);
+      alert('上传成功！');
+
+    } catch (error) {
+      console.error('上传出错:', error.message);
+    }
+  };
+
   return (
     <div className="flex flex-col animate-in fade-in duration-500">
       <header className="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="size-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700">
-             <img src="https://picsum.photos/id/64/100/100" alt="Avatar" className="w-full h-full object-cover" />
+            <img src="https://picsum.photos/id/64/100/100" alt="Avatar" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-xl font-bold tracking-tight">Library</h1>
         </div>
@@ -42,7 +95,7 @@ const Library: React.FC = () => {
           {MOCK_MEMORIES.map((memory) => (
             <div key={memory.id} className="flex-none w-64 group cursor-pointer" onClick={() => navigate(`/photo/1`)}>
               <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-2 shadow-lg">
-                <div 
+                <div
                   className="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-110"
                   style={{ backgroundImage: `url("${memory.coverUrl}")` }}
                 />
@@ -73,20 +126,20 @@ const Library: React.FC = () => {
           </div>
           <div className="grid grid-cols-3 gap-0.5 px-0.5">
             {photos.map((photo) => (
-              <div 
-                key={photo.id} 
+              <div
+                key={photo.id}
                 className="aspect-square relative group cursor-pointer overflow-hidden"
                 onClick={() => navigate(`/photo/${photo.id}`)}
               >
-                <img 
-                  src={photo.url} 
-                  alt={photo.alt} 
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                <img
+                  src={photo.url}
+                  alt={photo.alt}
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />
                 {photo.id === '1' && (
-                   <div className="absolute top-1 right-1">
-                      <span className="material-symbols-outlined text-white text-sm drop-shadow-md">auto_awesome</span>
-                   </div>
+                  <div className="absolute top-1 right-1">
+                    <span className="material-symbols-outlined text-white text-sm drop-shadow-md">auto_awesome</span>
+                  </div>
                 )}
               </div>
             ))}
@@ -95,8 +148,15 @@ const Library: React.FC = () => {
       ))}
 
       <button className="fixed bottom-24 right-6 size-14 bg-primary text-white rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform z-40">
-        <span className="material-symbols-outlined text-3xl">photo_camera</span>
+        <span className="material-symbols-outlined text-3xl" onClick={handleButtonClick}>photo_camera</span>
       </button>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept="image/*"
+      />
     </div>
   );
 };
