@@ -135,11 +135,11 @@ const Library: React.FC = () => {
                 onClick={() => navigate(`/photo/${photo.id}`)}
               >
                 <img
-                  src={photo.url}
-                  alt={photo.alt}
+                  src={`https://uarwrxxnlweigiflzozd.supabase.co/storage/v1/object/public/avatars/${photo.name}`}
+                  alt={photo.name}
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />
-                {photo.id === '1' && (
+                {photo.id === 'cd101ce2-803d-4a9a-aa46-089d430ecc45' && (
                   <div className="absolute top-1 right-1">
                     <span className="material-symbols-outlined text-white text-sm drop-shadow-md">auto_awesome</span>
                   </div>
