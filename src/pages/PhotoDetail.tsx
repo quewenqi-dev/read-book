@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_PHOTOS } from '../constants';
+import { MOCK_PHOTOS } from '../services/constants';
 import { GoogleGenAI } from "@google/genai";
 
 const PhotoDetail: React.FC = () => {

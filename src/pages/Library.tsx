@@ -1,10 +1,19 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState ,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_PHOTOS, MOCK_MEMORIES } from '../constants';
-import { createClient } from '@supabase/supabase-js'
+import { MOCK_PHOTOS, MOCK_MEMORIES, getPhotos } from '../services/constants';
+import { supabase } from '../lib/supabaseClient';
 const Library: React.FC = () => {
   const navigate = useNavigate();
+  const [supabasePhotos, setSupabasePhotos] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      const photos = await getPhotos();
+      setSupabasePhotos(photos);
+    };
+    fetchPhotos();
+  }, []);
 
   // Group photos by date
   const groupedPhotos = MOCK_PHOTOS.reduce((groups: Record<string, typeof MOCK_PHOTOS>, photo) => {
@@ -30,12 +39,6 @@ const Library: React.FC = () => {
       alert('请选择图片文件！');
       return;
     }
-    // 配置你的 Supabase 密钥
-    const SUPABASE_URL = 'https://uarwrxxnlweigiflzozd.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhcndyeHhubHdlaWdpZmx6b3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMDIxNDksImV4cCI6MjA4NTY3ODE0OX0.HAQfOQQM0iLWR7R_lzvT1SOL5Ks2yhyOfWlkv4xn1mw';
-    // 1. 初始化，注意这里变量名改成了 myClient
-    // 初始化客户端
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
     // 1. 生成唯一文件名 (防止重名覆盖)
     const fileExt = file.name.split('.').pop();
@@ -125,7 +128,7 @@ const Library: React.FC = () => {
             </p>
           </div>
           <div className="grid grid-cols-3 gap-0.5 px-0.5">
-            {photos.map((photo) => (
+            {supabasePhotos.map((photo) => (
               <div
                 key={photo.id}
                 className="aspect-square relative group cursor-pointer overflow-hidden"

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MOCK_ALBUMS, MOCK_PEOPLE } from '../constants';
+import { MOCK_ALBUMS, MOCK_PEOPLE } from '../services/constants';
 
 const Albums: React.FC = () => {
   const mediaTypes = [

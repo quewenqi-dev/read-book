@@ -1,5 +1,25 @@
 
-import { Photo, Album, Person, Memory } from './types';
+import { Photo, Album, Person, Memory } from '../../types';
+import { supabase } from '../lib/supabaseClient';
+
+export const getPhotos = async () => {
+  const { data, error } = await supabase
+    .storage
+    .from('avatars') // 你的 Bucket 名称
+    .list('', {      // 第一个参数是文件夹路径，根目录传空字符串
+      limit: 100,    // 获取条数
+      offset: 0,     // 分页偏移量
+      sortBy: { column: 'name', order: 'asc' }, // 排序
+    });
+
+  if (error) {
+    console.error('获取列表失败:', error);
+    return [];
+  } else {
+    console.log('文件列表:', data);
+    return data
+  }
+}
 
 export const MOCK_PHOTOS: Photo[] = [
   { id: '1', url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHX40u88-1WuRg0xkScLptyn7FSUG1XUIRFDeAo0Da5WJ5TCEf59KC8oyeet8pZae0w-BhH85n3rgI0z3fWQbZFdLnRz-kXOZXYky1JSnzQQMzYVhVeZEf7OaY6_rHSaOsAVdM-S1LFMNkYzduVk_juBjFK_QwSVjy-UNoUlXaH2byKBovK_ABi_E7MHbz3vMkVpeFqCRTcKR8CIWIsE9YmfvRjLFmKUIP0kQdzLOG0KKnUUuVvOOEv39TQviFYTdmR-stN4hEs3A', date: 'Yesterday', location: 'New York, NY', alt: 'Street photography in NY' },

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MOCK_MEMORIES } from '../constants';
+import { MOCK_MEMORIES } from '../services/constants';
 
 const ForYou: React.FC = () => {
   return (
