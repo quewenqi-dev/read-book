@@ -24,7 +24,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Navigate to="/library" replace />} />
           </Routes>
         </main>
-        <BottomNavbar />
+        {/* <BottomNavbar /> */}
       </div>
     </HashRouter>
   );
