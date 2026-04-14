@@ -6,6 +6,7 @@ import Albums from './pages/Albums';
 import Search from './pages/Search';
 import ForYou from './pages/ForYou';
 import PhotoDetail from './pages/PhotoDetail';
+import Game from './pages/Game';
 import BottomNavbar from './components/BottomNavbar';
 
 const App: React.FC = () => {
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <Route path="/albums" element={<Albums />} />
             <Route path="/search" element={<Search />} />
             <Route path="/photo/:id" element={<PhotoDetail />} />
+            <Route path="/game" element={<Game />} />
             <Route path="/" element={<Navigate to="/library" replace />} />
           </Routes>
         </main>
